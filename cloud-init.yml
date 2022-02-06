@@ -1,0 +1,24 @@
+#cloud-config
+timezone: Asia/Tokyo
+locale: ja_JP.utf8
+package_upgrade: true
+packages:
+  - bind9
+  - bind9utils
+write_files:
+  - path: /etc/bind/named.conf
+    content: |
+      options {
+        recursion yes;
+        allow-query { any; }; # do not expose externally
+        forwarders {
+            168.63.129.16;
+        };
+        forward only;
+        dnssec-validation no; # needed for private dns zones
+        auth-nxdomain no; # conform to RFC1035
+        listen-on { any; };
+      };
+runcmd:
+  - sudo systemctl enable bind9
+  - sudo systemctl restart bind9
